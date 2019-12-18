@@ -216,7 +216,6 @@ class UserController extends Controller {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
    */
   public function deleteAction($id, Request $request) {
-
     /** @var UserManager $userManager */
     $userManager = $this->get('fos_user.user_manager');
     /** @var UserDocument $user */

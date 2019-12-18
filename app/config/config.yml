@@ -80,3 +80,4 @@ fos_user:
     profile:
         form:
             type: Deeson\WardenBundle\Form\ProfileFormType
+            validation_groups:  [Default]
