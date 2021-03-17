@@ -378,10 +378,10 @@ class DrupalModuleDocument extends BaseDocument {
     }
 
     $versionInfo = self::getVersionInfo($moduleData['version']);
-    $versionNumber = sprintf('%d.x-%d.%d', $versionInfo['major'], $versionInfo['minor'], $versionInfo['other']);
+    $versionNumber = sprintf('%d.%d.%d', $versionInfo['major'], $versionInfo['minor'], $versionInfo['other']);
     $latestVersionInfo = self::getVersionInfo($moduleData['latestVersion']);
-    $latestVersionNumber = sprintf('%d.x-%d.%d', $latestVersionInfo['major'], $latestVersionInfo['minor'], $latestVersionInfo['other']);
-    if ($versionNumber === '0.x-0.0' || $latestVersionNumber === '0.x-0.0') {
+    $latestVersionNumber = sprintf('%d.%d.%d', $latestVersionInfo['major'], $latestVersionInfo['minor'], $latestVersionInfo['other']);
+    if ($versionNumber === '0.0.0' || $latestVersionNumber === '0.0.0') {
       return FALSE;
     }
     return $versionNumber == $latestVersionNumber;

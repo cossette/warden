@@ -3,8 +3,9 @@
 namespace Deeson\WardenDrupalBundle\Test\Unit\Document;
 
 use Deeson\WardenDrupalBundle\Document\DrupalModuleDocument;
+use PHPUnit\Framework\TestCase;
 
-class ModuleDocumentTest extends \PHPUnit_Framework_TestCase {
+class ModuleDocumentTest extends TestCase {
 
   /**
    * @test
@@ -15,6 +16,8 @@ class ModuleDocumentTest extends \PHPUnit_Framework_TestCase {
     $this->assertNotEquals('1', DrupalModuleDocument::getMajorVersion('7.x-1.3'), '1 is not the major version of 7.x-1.3');
     $this->assertNotEquals('3', DrupalModuleDocument::getMajorVersion('7.x-1.3'), '3 is not the major version of 7.x-1.3');
     $this->assertEquals('8', DrupalModuleDocument::getMajorVersion('8.3.2'), '8 is the major version of 8.3.2');
+    $this->assertNotEquals('3', DrupalModuleDocument::getMajorVersion('8.3.2'), '8 is the major version of 8.3.2');
+    $this->assertNotEquals('2', DrupalModuleDocument::getMajorVersion('8.3.2'), '8 is the major version of 8.3.2');
   }
 
   /**
@@ -153,7 +156,13 @@ class ModuleDocumentTest extends \PHPUnit_Framework_TestCase {
       'latestVersion' => '7.x-1.3',
       'version' => '7.x-1.3'
     );
-    $this->assertEquals(TRUE, DrupalModuleDocument::versionsEqual($moduleData), 'Versions matche');
+    $this->assertEquals(TRUE, DrupalModuleDocument::versionsEqual($moduleData), 'Versions match (D7)');
+
+    $moduleData = array(
+      'latestVersion' => '8.1.3',
+      'version' => '8.1.3'
+    );
+    $this->assertEquals(TRUE, DrupalModuleDocument::versionsEqual($moduleData), 'Versions match (D8)');
 
     $moduleData = array(
       'latestVersion' => '7.x-1.3',
@@ -336,5 +345,18 @@ class ModuleDocumentTest extends \PHPUnit_Framework_TestCase {
     $this->assertEquals(FALSE, DrupalModuleDocument::isVersionUnsupported($moduleVersions, $module), '4.3: Version "7.x-3.1" is supported for recommended or other version');
 
     // @todo add d8 version unsupported tests.
+    $moduleVersions = array(
+      DrupalModuleDocument::MODULE_VERSION_TYPE_RECOMMENDED => array(
+        'version' => '8.2.2',
+      ),
+      DrupalModuleDocument::MODULE_VERSION_TYPE_OTHER => array(
+        'version' => '8.3.1',
+      )
+    );
+    $module = array(
+      'name' => 'test_module',
+      'version' => '8.1.1',
+    );
+    $this->assertEquals(TRUE, DrupalModuleDocument::isVersionUnsupported($moduleVersions, $module), '5.1: Version "8.1.1" is not supported for recommended or other version');
   }
 }
