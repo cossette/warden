@@ -42,11 +42,13 @@ class SiteDrupalDocument extends BaseDocument {
    * @return string
    */
   public function getTypeImagePath() {
-    if ($this->getCoreVersion() < 8) {
-      return 'bundles/deesonwardendrupal/images/drupal7-logo.png';
-    }
+    // Grab first digits before first dot
+    preg_match("/^(\d)*?\./", $this->getCoreVersion(), $matches);
 
-    return 'bundles/deesonwardendrupal/images/drupal8-logo.png';
+    // If none found, defaults to drupal 8
+    $version = (isset($matches[1])) ? $matches[1] : 8;
+
+    return 'bundles/deesonwardendrupal/images/drupal' . $version . '-logo.png';
   }
 
   /**

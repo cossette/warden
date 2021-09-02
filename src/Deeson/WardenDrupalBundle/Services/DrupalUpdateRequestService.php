@@ -193,6 +193,11 @@ class DrupalUpdateRequestService {
       $recommendedMajorVersion = (string) $requestXmlObject->recommended_major;
       $supportedMajor = (string) $requestXmlObject->supported_majors;
       $supportedMajorVersions = explode(',', $supportedMajor);
+    } else {
+      // TODO This will need to be reworked once Drupal 10 is out
+	  // In the current xml file, supported_majors key doesn't exist
+      $recommendedMajorVersion = (string) 9;
+      $supportedMajorVersions = [9];
     }
 
     $latestReleaseVersions = array();
@@ -210,6 +215,10 @@ class DrupalUpdateRequestService {
           /*if (!is_null($versionInfo['extra'])) {
             continue;
           }*/
+        }elseif(preg_match('/^(' . implode('|', $supportedMajorVersions) . ')/', $release->version, $matches)){
+          $key = array_search($matches[1], $supportedMajorVersions);
+          $release->version_major = $matches[1];
+          $latestReleaseVersions[$supportedMajorVersions[$key]][] = $release;
         }
       }
     }
@@ -246,7 +255,14 @@ class DrupalUpdateRequestService {
    * @return mixed
    */
   protected function getRequestUrl() {
-    return 'https://updates.drupal.org/release-history/' . $this->moduleRequestName . '/' . $this->moduleRequestVersion;
+    // TODO This might change in the future
+	// drupal update release history for 9.x doesn't exist, we need to use /current for now
+	// might change in the future
+    if ($this->moduleRequestName == 'drupal' && $this->moduleRequestVersion == '9.x') {
+      return 'https://updates.drupal.org/release-history/' . $this->moduleRequestName . '/current';
+    } else {
+      return 'https://updates.drupal.org/release-history/' . $this->moduleRequestName . '/' . $this->moduleRequestVersion;
+    }
   }
 
   /**
@@ -292,13 +308,16 @@ class DrupalUpdateRequestService {
 
       /** @var DrupalModuleDocument $module */
       foreach ($modules as $module) {
+        if (empty($module->getProjectName()))
+          continue;
+
         $this->logger->addInfo('Updating - ' . $module->getProjectName() . ' for version: ' . $version);
 
         try {
           $this->processDrupalUpdateData($module->getProjectName(), $version);
         }
         catch (\Exception $e) {
-          $this->logger->addWarning(' - Unable to update module version [' . $version . ']: ' . $e->getMessage());
+          $this->logger->addWarning(' - Unable to update module ' . $module->getProjectName() . ' version [' . $version . ']: ' . $e->getMessage());
           continue;
         }
 
